@@ -66,6 +66,8 @@ exports.getProductColor = (req, res, next) => {
       p.sex,
       p.category,
       p.material,
+      pc.price,
+      pc.discount,
       JSON_ARRAYAGG(
         JSON_OBJECT(
             'size', ps.size,
