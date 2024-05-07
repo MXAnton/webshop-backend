@@ -1,6 +1,7 @@
 const AppError = require("../utils/appError");
 const conn = require("../services/db");
 
+/*
 exports.getProduct = (req, res, next) => {
   conn.query(
     `SELECT
@@ -11,6 +12,7 @@ exports.getProduct = (req, res, next) => {
       p.material,
       JSON_ARRAYAGG(
         JSON_OBJECT(
+          'id', pc.id,
           'color', pc.color,
           'price', pc.price,
           'discount', pc.discount,
@@ -49,6 +51,66 @@ exports.getProduct = (req, res, next) => {
         status: "success",
         length: data?.length,
         data: data[0],
+      });
+    }
+  );
+};
+*/
+
+exports.getProductColor = (req, res, next) => {
+  conn.query(
+    `SELECT
+      p.id AS product_id,
+      p.name,
+      p.brand,
+      p.sex,
+      p.category,
+      p.material,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'size', ps.size,
+            'quantity', ps.quantity
+        )
+      ) AS sizes
+    FROM
+      product_color pc
+    JOIN
+      product p ON pc.product_id = p.id
+    JOIN
+      product_size ps ON pc.id = ps.color_id
+    WHERE
+      pc.id = ?
+    GROUP BY
+      p.id;`,
+    [req.params.id],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+
+      res.status(200).json({
+        status: "success",
+        length: data?.length,
+        data: data[0],
+      });
+    }
+  );
+};
+exports.getProductColors = (req, res, next) => {
+  conn.query(
+    `SELECT
+      pc.id,
+      pc.color
+    FROM
+      product_color pc
+    WHERE
+      pc.product_id = ?;`,
+    [req.params.id],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+
+      res.status(200).json({
+        status: "success",
+        length: data?.length,
+        data: data,
       });
     }
   );
