@@ -14,6 +14,7 @@ const router = express.Router();
 
 router.route("/products/female").get(controllers.getProductsFemale);
 router.route("/products/male").get(controllers.getProductsMale);
+router.route("/products/best-sellers/:amount").get(controllers.getBestSellers);
 
 router.route("/product/color/:id").get(controllers.getProductColor);
 router.route("/product/:id/colors").get(controllers.getProductColors);
