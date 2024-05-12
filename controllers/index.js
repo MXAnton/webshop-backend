@@ -119,7 +119,7 @@ exports.getProductColors = (req, res, next) => {
   );
 };
 
-exports.getProductsFemale = (req, res, next) => {
+exports.getProductsSex = (req, res, next) => {
   conn.query(
     `SELECT
       pc.id,
@@ -130,30 +130,8 @@ exports.getProductsFemale = (req, res, next) => {
       product_color pc
     JOIN
       product p ON pc.product_id = p.id
-    WHERE p.sex = 'female' OR p.sex = 'unisex';`,
-    function (err, data, fields) {
-      if (err) return next(new AppError(err, 500));
-
-      res.status(200).json({
-        status: "success",
-        length: data?.length,
-        data: data,
-      });
-    }
-  );
-};
-exports.getProductsMale = (req, res, next) => {
-  conn.query(
-    `SELECT
-      pc.id,
-      p.name,
-      pc.price,
-      pc.discount
-    FROM
-      product_color pc
-    JOIN
-      product p ON pc.product_id = p.id
-    WHERE p.sex = 'male' OR p.sex = 'unisex';`,
+    WHERE p.sex = ? OR p.sex = 'unisex';`,
+    [req.params.sex],
     function (err, data, fields) {
       if (err) return next(new AppError(err, 500));
 
