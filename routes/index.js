@@ -13,6 +13,10 @@ const router = express.Router();
 //   .delete(middleware.authorize, controllers.deleteMember);
 
 router.route("/products/:sex").get(controllers.getProductsSex);
+router
+  .route("/products/:sex/:categories")
+  .get(controllers.getProductsSexCategories);
+
 router.route("/products/best-sellers/:amount").get(controllers.getBestSellers);
 
 router.route("/product/color/:id").get(controllers.getProductColor);

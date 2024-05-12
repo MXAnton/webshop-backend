@@ -144,6 +144,33 @@ exports.getProductsSex = (req, res, next) => {
   );
 };
 
+exports.getProductsSexCategories = (req, res, next) => {
+  const categories = req.params.categories.split("~");
+
+  conn.query(
+    `SELECT
+      pc.id,
+      p.name,
+      pc.price,
+      pc.discount
+    FROM
+      product_color pc
+    JOIN
+      product p ON pc.product_id = p.id
+    WHERE (p.sex = ? OR p.sex = 'unisex') AND p.category IN (?);`,
+    [req.params.sex, categories],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+
+      res.status(200).json({
+        status: "success",
+        length: data?.length,
+        data: data,
+      });
+    }
+  );
+};
+
 exports.getBestSellers = (req, res, next) => {
   conn.query(
     `SELECT
