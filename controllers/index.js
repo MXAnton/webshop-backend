@@ -145,7 +145,7 @@ exports.getProductsSex = (req, res, next) => {
 };
 
 exports.getProductsSexCategories = (req, res, next) => {
-  const categories = req.params.categories.split("~");
+  const categories = req.params.categories.split(",");
 
   conn.query(
     `SELECT
