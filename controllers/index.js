@@ -57,6 +57,44 @@ exports.getProduct = (req, res, next) => {
 };
 */
 
+exports.getProductsCategories = (req, res, next) => {
+  conn.query(
+    `SELECT
+      p.category
+    FROM
+      product p
+    WHERE
+      p.sex != "female"
+    GROUP BY category;`,
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+
+      let categories = [data.map((item) => item.category)];
+
+      conn.query(
+        `SELECT
+          p.category
+        FROM
+          product p
+        WHERE
+          p.sex != "male"
+        GROUP BY category;`,
+        function (err, data, fields) {
+          if (err) return next(new AppError(err, 500));
+
+          categories.push(data.map((item) => item.category));
+
+          res.status(200).json({
+            status: "success",
+            length: categories.flat().length, // Retrieves length of all child arrays together
+            data: categories,
+          });
+        }
+      );
+    }
+  );
+};
+
 exports.getProductColor = (req, res, next) => {
   conn.query(
     `SELECT

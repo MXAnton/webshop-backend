@@ -12,6 +12,8 @@ const router = express.Router();
 //   .put(middleware.authorize, controllers.updateMember)
 //   .delete(middleware.authorize, controllers.deleteMember);
 
+router.route("/products/categories").get(controllers.getProductsCategories);
+
 router.route("/products/:sex").get(controllers.getProductsSex);
 router
   .route("/products/:sex/:categories")
