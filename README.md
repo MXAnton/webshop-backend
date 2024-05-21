@@ -7,7 +7,7 @@ The backend API is built using Node.js and Express. MySQL is used as database.
 - `MySQL` database.
 
 ## 🔒 Enviroment vars
-- DB_HOST="localhost"
+- DB_HOST="" # Ex: "localhost"
 - DB_NAME=""
 - DB_USER=""
 - DB_PASSWORD=""
