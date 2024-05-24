@@ -122,6 +122,14 @@ exports.getProductsSex = (req, res, next) => {
     query += " AND p.brand IN (?)";
     values.push(req.query.brands);
   }
+  if (req.query.minPrice != null) {
+    query += " AND pc.price - pc.discount >= ?";
+    values.push(req.query.minPrice);
+  }
+  if (req.query.maxPrice != null) {
+    query += " AND pc.price - pc.discount <= ?";
+    values.push(req.query.maxPrice);
+  }
 
   query += ";";
   conn.query(query, values, function (err, data, fields) {
