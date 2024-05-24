@@ -140,6 +140,11 @@ exports.getProductsSex = (req, res, next) => {
     query += " AND p.material IN (?)";
     values.push(req.query.materials);
   }
+  if (req.query.onSale == "true") {
+    query += " AND pc.discount > 0";
+  } else if (req.query.onSale == "false") {
+    query += " AND pc.discount = 0";
+  }
 
   query += " GROUP BY pc.id, p.name";
 
