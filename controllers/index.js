@@ -106,21 +106,14 @@ exports.getProductsSex = (req, res, next) => {
                 pc.id,
                 p.name,
                 pc.price,
-                pc.discount,
-                pc.color,
-                JSON_ARRAYAGG(
-                    ps.size
-                ) AS sizes
+                pc.discount
               FROM
                 product_color pc
               JOIN
                 product p ON pc.product_id = p.id
               JOIN
                 product_size ps ON pc.id = ps.color_id
-              WHERE (p.sex = ? OR p.sex = 'unisex')
-              GROUP BY
-                pc.id,
-                p.name`;
+              WHERE (p.sex = ? OR p.sex = 'unisex')`;
   let values = [req.params.sex];
 
   if (req.query.categories != null) {
@@ -143,6 +136,13 @@ exports.getProductsSex = (req, res, next) => {
     query += " AND pc.color IN (?)";
     values.push(req.query.colors);
   }
+  if (req.query.materials != null) {
+    query += " AND p.material IN (?)";
+    values.push(req.query.materials);
+  }
+
+  query += " GROUP BY pc.id, p.name";
+
   if (req.query.sizes != null) {
     query += " HAVING JSON_OVERLAPS(JSON_ARRAYAGG(ps.size), JSON_ARRAY(?))";
 
