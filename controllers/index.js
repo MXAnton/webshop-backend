@@ -1,62 +1,6 @@
 const AppError = require("../utils/appError");
 const conn = require("../services/db");
 
-/*
-exports.getProduct = (req, res, next) => {
-  conn.query(
-    `SELECT
-      p.name,
-      p.brand,
-      p.sex,
-      p.category,
-      p.material,
-      JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'id', pc.id,
-          'color', pc.color,
-          'price', pc.price,
-          'discount', pc.discount,
-          'sizes', sizes.sizes
-        )
-      ) AS colors
-    FROM
-      product p
-    JOIN
-      product_color pc ON p.id = pc.product_id
-    JOIN (
-        SELECT 
-            pc.id AS color_id,
-            JSON_ARRAYAGG(
-                JSON_OBJECT(
-                    'size', ps.size,
-                    'quantity', ps.quantity
-                )
-            ) AS sizes
-        FROM 
-            product_color pc
-        JOIN 
-            product_size ps ON pc.id = ps.color_id
-        GROUP BY 
-            pc.id
-    ) AS sizes ON pc.id = sizes.color_id
-    WHERE
-      p.id = ?
-    GROUP BY
-      p.id;`,
-    [req.params.id],
-    function (err, data, fields) {
-      if (err) return next(new AppError(err, 500));
-
-      res.status(200).json({
-        status: "success",
-        length: data?.length,
-        data: data[0],
-      });
-    }
-  );
-};
-*/
-
 exports.getProductsCategories = (req, res, next) => {
   conn.query(
     `SELECT
@@ -158,55 +102,37 @@ exports.getProductColors = (req, res, next) => {
 };
 
 exports.getProductsSex = (req, res, next) => {
-  conn.query(
-    `SELECT
-      pc.id,
-      p.name,
-      pc.price,
-      pc.discount
-    FROM
-      product_color pc
-    JOIN
-      product p ON pc.product_id = p.id
-    WHERE p.sex = ? OR p.sex = 'unisex';`,
-    [req.params.sex],
-    function (err, data, fields) {
-      if (err) return next(new AppError(err, 500));
+  let query = `SELECT
+                pc.id,
+                p.name,
+                pc.price,
+                pc.discount
+              FROM
+                product_color pc
+              JOIN
+                product p ON pc.product_id = p.id
+              WHERE (p.sex = ? OR p.sex = 'unisex')`;
+  let values = [req.params.sex];
 
-      res.status(200).json({
-        status: "success",
-        length: data?.length,
-        data: data,
-      });
-    }
-  );
-};
+  if (req.query.categories != null) {
+    query += " AND p.category IN (?)";
+    values.push(req.query.categories);
+  }
+  if (req.query.brands != null) {
+    query += " AND p.brand IN (?)";
+    values.push(req.query.brands);
+  }
 
-exports.getProductsSexCategories = (req, res, next) => {
-  const categories = req.params.categories.split(",");
+  query += ";";
+  conn.query(query, values, function (err, data, fields) {
+    if (err) return next(new AppError(err, 500));
 
-  conn.query(
-    `SELECT
-      pc.id,
-      p.name,
-      pc.price,
-      pc.discount
-    FROM
-      product_color pc
-    JOIN
-      product p ON pc.product_id = p.id
-    WHERE (p.sex = ? OR p.sex = 'unisex') AND p.category IN (?);`,
-    [req.params.sex, categories],
-    function (err, data, fields) {
-      if (err) return next(new AppError(err, 500));
-
-      res.status(200).json({
-        status: "success",
-        length: data?.length,
-        data: data,
-      });
-    }
-  );
+    res.status(200).json({
+      status: "success",
+      length: data?.length,
+      data: data,
+    });
+  });
 };
 
 exports.getBestSellers = (req, res, next) => {
@@ -234,37 +160,6 @@ exports.getBestSellers = (req, res, next) => {
 };
 
 /*
-exports.getAllMembers = (req, res, next) => {
-  conn.query("SELECT * FROM member", function (err, data, fields) {
-    if (err) return next(new AppError(err));
-    res.status(200).json({
-      status: "success",
-      length: data?.length,
-      data: data,
-    });
-  });
-};
-
-exports.getMember = (req, res, next) => {
-  const personNumRes = isPersonNumValid(req.params.personnummer);
-  if (personNumRes !== true) {
-    return next(new AppError(personNumRes, 400));
-  }
-
-  conn.query(
-    "SELECT * FROM member WHERE personnummer = ?",
-    [req.params.personnummer],
-    function (err, data, fields) {
-      if (err) return next(new AppError(err, 500));
-      res.status(200).json({
-        status: "success",
-        length: data?.length,
-        data: data,
-      });
-    }
-  );
-};
-
 exports.createMember = (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
   const personNumRes = isPersonNumValid(req.body.personnummer);

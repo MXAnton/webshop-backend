@@ -4,10 +4,7 @@ const router = express.Router();
 
 router.route("/products/categories").get(controllers.getProductsCategories);
 
-router.route("/products/:sex").get(controllers.getProductsSex);
-router
-  .route("/products/:sex/:categories")
-  .get(controllers.getProductsSexCategories);
+router.route("/products/sex/:sex").get(controllers.getProductsSex);
 
 router.route("/best-sellers/:amount").get(controllers.getBestSellers);
 
