@@ -106,7 +106,8 @@ exports.getProductsSex = (req, res, next) => {
                 pc.id,
                 p.name,
                 pc.price,
-                pc.discount
+                pc.discount,
+                pc.color
               FROM
                 product_color pc
               JOIN
@@ -129,6 +130,10 @@ exports.getProductsSex = (req, res, next) => {
   if (req.query.maxPrice != null) {
     query += " AND pc.price - pc.discount <= ?";
     values.push(req.query.maxPrice);
+  }
+  if (req.query.colors != null) {
+    query += " AND pc.color IN (?)";
+    values.push(req.query.colors);
   }
 
   query += ";";
