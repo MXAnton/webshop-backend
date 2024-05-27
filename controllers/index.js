@@ -103,10 +103,10 @@ exports.getProductsFiltersBySex = (req, res, next) => {
             result.materials.push(row.value);
             break;
           case "min_price":
-            result.minPrice = row.value;
+            result.minPrice = Math.floor(row.value);
             break;
           case "max_price":
-            result.maxPrice = row.value;
+            result.maxPrice = Math.ceil(row.value);
             break;
           case "color":
             result.colors.push(row.value);
