@@ -156,7 +156,7 @@ exports.getProductsSex = (req, res, next) => {
     values.push(intArray);
   }
 
-  query += ";";
+  query += " LIMIT 25;";
   conn.query(query, values, function (err, data, fields) {
     if (err) return next(new AppError(err, 500));
 
