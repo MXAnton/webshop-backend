@@ -39,6 +39,93 @@ exports.getProductsCategories = (req, res, next) => {
   );
 };
 
+exports.getProductsFiltersBySex = (req, res, next) => {
+  conn.query(
+    `SELECT DISTINCT brand AS value, 'brand' AS type
+        FROM product
+        WHERE (sex = ? OR sex = 'unisex')
+      UNION
+      SELECT DISTINCT material AS value, 'material' AS type
+        FROM product 
+        WHERE (sex = ? OR sex = 'unisex')
+      UNION
+      SELECT MIN(pc.price - pc.discount) AS value, 'min_price' AS type
+        FROM product p
+        JOIN
+          product_color pc ON pc.product_id = p.id
+        WHERE (p.sex = ? OR p.sex = 'unisex')
+      UNION
+      SELECT MAX(pc.price - pc.discount) AS value, 'max_price' AS type
+        FROM product p
+        JOIN
+          product_color pc ON pc.product_id = p.id
+        WHERE (p.sex = ? OR p.sex = 'unisex')
+      UNION
+      SELECT DISTINCT pc.color AS value, 'color' AS type
+        FROM product p
+        JOIN
+          product_color pc ON pc.product_id = p.id
+        WHERE (p.sex = ? OR p.sex = 'unisex')
+      UNION
+      SELECT DISTINCT ps.size AS value, 'size' AS type
+        FROM product p
+        JOIN
+          product_color pc ON pc.product_id = p.id
+        JOIN
+          product_size ps ON ps.color_id = pc.id
+        WHERE (p.sex = ? OR p.sex = 'unisex');`,
+    [
+      req.params.sex,
+      req.params.sex,
+      req.params.sex,
+      req.params.sex,
+      req.params.sex,
+      req.params.sex,
+    ],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+
+      const result = {
+        brands: [],
+        materials: [],
+        minPrice: 0,
+        maxPrice: 999,
+        colors: [],
+        sizes: [],
+      };
+
+      data.forEach((row) => {
+        switch (row.type) {
+          case "brand":
+            result.brands.push(row.value);
+            break;
+          case "material":
+            result.materials.push(row.value);
+            break;
+          case "min_price":
+            result.minPrice = row.value;
+            break;
+          case "max_price":
+            result.maxPrice = row.value;
+            break;
+          case "color":
+            result.colors.push(row.value);
+            break;
+          case "size":
+            result.sizes.push(row.value);
+            break;
+        }
+      });
+
+      res.status(200).json({
+        status: "success",
+        length: data.length,
+        data: result,
+      });
+    }
+  );
+};
+
 exports.getProductColor = (req, res, next) => {
   conn.query(
     `SELECT
