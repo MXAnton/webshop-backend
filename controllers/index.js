@@ -243,6 +243,20 @@ exports.getProductsSex = (req, res, next) => {
     values.push(intArray);
   }
 
+  switch (req.query.sorting) {
+    case "lowest-price":
+      query += " ORDER BY pc.price - pc.discount";
+      break;
+    case "highest-price":
+      query += " ORDER BY pc.price - pc.discount DESC";
+      break;
+    case "a-z":
+      query += " ORDER BY p.name";
+      break;
+    case "z-a":
+      query += " ORDER BY p.name DESC";
+      break;
+  }
   query += " LIMIT 25;";
   conn.query(query, values, function (err, data, fields) {
     if (err) return next(new AppError(err, 500));
