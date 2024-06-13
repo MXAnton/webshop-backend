@@ -1,6 +1,9 @@
 # Your Shoes backend
 The backend API is built using Node.js and Express. MySQL is used as database.
 
+## 🎮 Try the website using this backend
+Try the live website using this backend: [your-shoes.netlify.app](https://your-shoes.netlify.app/).
+
 ## 📚 Tech stack
 - `Node.js` runs the code.
 - `Express.js` creating the API that makes the frontend able to connect to the backend.
