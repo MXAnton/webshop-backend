@@ -12,6 +12,7 @@ router.route("/products/sex/:sex").get(controllers.getProductsSex);
 
 router.route("/best-sellers/:amount").get(controllers.getBestSellers);
 
+router.route("/products-colors/:ids").get(controllers.getProductsColors);
 router.route("/product/color/:id").get(controllers.getProductColor);
 router.route("/product/:id/colors").get(controllers.getProductColors);
 

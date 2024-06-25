@@ -125,6 +125,37 @@ exports.getProductsFiltersBySex = (req, res, next) => {
     }
   );
 };
+exports.getProductsColors = (req, res, next) => {
+  conn.query(
+    `SELECT
+      pc.id,
+      p.name,
+      pc.price,
+      pc.discount
+    FROM
+      product_color pc
+    JOIN
+      product p ON pc.product_id = p.id
+    WHERE
+      pc.id in (?);`,
+    [req.params.ids.split(",").map(Number)],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+
+      // Ensure price and discount are converted to numbers
+      data.forEach((item) => {
+        item.price = parseFloat(item.price);
+        item.discount = parseFloat(item.discount);
+      });
+
+      res.status(200).json({
+        status: "success",
+        length: data?.length,
+        data: data,
+      });
+    }
+  );
+};
 
 exports.getProductColor = (req, res, next) => {
   conn.query(
