@@ -125,19 +125,24 @@ exports.getProductsFiltersBySex = (req, res, next) => {
     }
   );
 };
-exports.getProductsColors = (req, res, next) => {
+exports.getSizesByIds = (req, res, next) => {
   conn.query(
     `SELECT
-      pc.id,
+      ps.id,
+      pc.id AS color_id,
       p.name,
       pc.price,
-      pc.discount
+      pc.discount,
+      ps.size,
+      ps.quantity AS quantity_available
     FROM
-      product_color pc
+      product_size ps
+    JOIN
+      product_color pc ON ps.color_id = pc.id
     JOIN
       product p ON pc.product_id = p.id
     WHERE
-      pc.id in (?);`,
+      ps.id in (?);`,
     [req.params.ids.split(",").map(Number)],
     function (err, data, fields) {
       if (err) return next(new AppError(err, 500));
