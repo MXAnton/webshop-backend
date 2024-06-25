@@ -177,6 +177,7 @@ exports.getProductColor = (req, res, next) => {
       pc.color,
       JSON_ARRAYAGG(
         JSON_OBJECT(
+            'id', ps.id,
             'size', ps.size,
             'quantity', ps.quantity
         )
