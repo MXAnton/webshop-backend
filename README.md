@@ -17,7 +17,8 @@ Try the live website using this backend: [your-shoes.netlify.app](https://your-s
 - WHITELISTED_ORIGIN=* # The domain that is allowed to access the backend, the frontend.
 - PORT=4000 # The port you want to run the backend on
 - NODE_ENV='development'
-
+- WEBSITE_DOMAIN="" # Ex: "http://localhost:8080"
+- STRIPE_KEY="" # Secret key to the Stripe API
 
 ## 📝 Edit the code
 If you want to make changes to the backend follow these steps:
