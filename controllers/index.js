@@ -1,6 +1,9 @@
 const AppError = require("../utils/appError");
 const conn = require("../services/db");
 
+const util = require("util");
+const stripe = require("stripe")(process.env.STRIPE_KEY);
+
 exports.getProductsCategories = (req, res, next) => {
   conn.query(
     `SELECT
@@ -330,6 +333,81 @@ exports.getBestSellers = (req, res, next) => {
     }
   );
 };
+
+exports.createCheckoutSession = async (req, res, next) => {
+  const products = JSON.parse(req.body.products);
+  if (products == null || products.length === 0) {
+    return next(new AppError("No products to checkout", 404));
+  }
+
+  const productsExtrasRes = await getCheckoutProductsExtras(
+    products.map((_item) => _item.id)
+  );
+  if (productsExtrasRes == null) {
+    return next(new AppError("Didn't find products to checkout", 404));
+  }
+
+  // Merge arrays based on 'id' property and construct price_data objects
+  const lineItems = productsExtrasRes.map((product1) => {
+    const product2 = products.find((product2) => product2.id === product1.id);
+    return {
+      price_data: {
+        currency: "eur",
+        unit_amount: product1.discounted_price * 100,
+        product_data: {
+          name: product1.name,
+          description: product1.brand,
+          images: [product2.image],
+        },
+      },
+      quantity: product2.quantity,
+    };
+  });
+
+  // Create stripe checkout session
+  const session = await stripe.checkout.sessions.create({
+    line_items: lineItems,
+    mode: "payment",
+    success_url: `${process.env.WEBSITE_DOMAIN}/checkout-success`,
+    cancel_url: `${process.env.WEBSITE_DOMAIN}/checkout-cancel`,
+  });
+
+  // Send success status with link to checkout session
+  res.status(201).json({
+    status: "success",
+    length: 1,
+    data: session.url,
+  });
+};
+async function getCheckoutProductsExtras(_ids) {
+  // Promisify the conn.query method
+  const query = util.promisify(conn.query).bind(conn);
+
+  try {
+    // Execute the query and wait for the result
+    const data = await query(
+      `SELECT
+          ps.id,
+          p.name,
+          p.brand,
+          pc.price - pc.discount AS discounted_price
+        FROM
+          product_size ps
+        JOIN
+          product_color pc ON ps.color_id = pc.id
+        JOIN
+          product p ON pc.product_id = p.id
+        WHERE
+          ps.id in (?);`,
+      [_ids]
+    );
+
+    return data;
+  } catch (err) {
+    // Handle any errors that occur during the query
+    throw err;
+  }
+}
 
 /*
 exports.createMember = (req, res, next) => {

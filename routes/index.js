@@ -17,4 +17,8 @@ router.route("/product/:id/colors").get(controllers.getProductColors);
 
 router.route("/sizes/:ids").get(controllers.getSizesByIds);
 
+router
+  .route("/create-checkout-session")
+  .post(controllers.createCheckoutSession);
+
 module.exports = router;
