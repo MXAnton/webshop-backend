@@ -1,5 +1,5 @@
 # Your Shoes backend
-The backend API is built using Node.js and Express. MySQL is used as database.
+The backend API is built using Node.js and Express. MySQL is used as database and Stripe for payment.
 
 ## 🎮 Try the website using this backend
 Try the live website using this backend: [your-shoes.netlify.app](https://your-shoes.netlify.app/).
@@ -8,6 +8,7 @@ Try the live website using this backend: [your-shoes.netlify.app](https://your-s
 - `Node.js` runs the code.
 - `Express.js` creating the API that makes the frontend able to connect to the backend.
 - `MySQL` database.
+- `Stripe` for payment.
 
 ## 🔒 Enviroment vars
 - DB_HOST="" # Ex: "localhost"
